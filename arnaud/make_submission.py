@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 
-def make_submission(json_path: Path = Path("arnaud/test_labels_text_rf.json")):
+def make_submission(json_path: Path = Path("arnaud/test_labels_text_METTRELEBONNOM.json")):
     with open(json_path, "r") as file:
         test_labels = json.load(file)
 

@@ -227,7 +227,7 @@ def train(model, train_graphs, optimizer, criterion,):
     for data in train_graphs.values():
         optimizer.zero_grad()  # Clear gradients.
         out = model(data)  # Perform a single forward pass.
-        loss = criterion(out, data.y.long())  # Compute the loss solely based on the training nodes.
+        loss = criterion(out.float(), data.y.float().view(-1, 1))  # Compute the loss solely based on the training nodes.
         loss.backward()  # Derive gradients.
         optimizer.step()  # Update parameters based on gradients.
         loss_tot += loss
@@ -246,9 +246,10 @@ def f1_score_moyen(model, graphs):
 
 def prediction(model, graph):
     model.eval()
-    out = model(graph)
-    _, predicted = torch.max(out, 1)
-    return predicted.numpy()
+    with torch.no_grad():
+        logits = model(graph)
+        predictions = torch.sigmoid(logits)
+    return (predictions > model.threshold).int()
 
 
 def make_test_csv_submission(model, test_graphs, submission_name):
@@ -271,9 +272,7 @@ def analyse_model(model, validation_graphs):
     S = 0
     global_conf_matrix = np.zeros((2,2))
     for data in validation_graphs.values():
-        out = model(data)
-        _, predicted = torch.max(out, 1)
-        y_pred = predicted.numpy()
+        y_pred = prediction(model, data)
         y_true = data.y.numpy()
         conf_matrix = confusion_matrix(y_true, y_pred)
         global_conf_matrix += conf_matrix

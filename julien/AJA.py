@@ -115,16 +115,11 @@ def get_data(bert=True):
 
     return df_train_nodes, df_train_edges, df_test_nodes, df_test_edges
 
-def basic_node_extraction(df):
-    df = df.drop('speaker_text', axis=1)
-    df['sentence_length'] = df['text'].apply(lambda x: len(x.split()))
-    df = df.drop('text', axis=1)
-    return df
 
 def identity(x):
     return x
 
-def get_graphs(nodes_features_extraction=basic_node_extraction, edges_features_extraction=identity, validation_ratio=0.3):
+def get_graphs(nodes_features_extraction=identity, edges_features_extraction=identity, validation_ratio=0.3):
     """
     nodes_features_extraction must follow thoses rules:
         - it does not change the number of lines of the dataframe
@@ -157,7 +152,8 @@ def get_graphs(nodes_features_extraction=basic_node_extraction, edges_features_e
         df_nodes = df_nodes.drop('line', axis=1)
         labels_np = df_nodes['label'].values
         df_nodes = df_nodes.drop('label', axis=1)
-        nodes = df_nodes.to_numpy()
+        df_numerique = df_nodes.select_dtypes(include='number')
+        nodes = df_numerique.to_numpy()
         x = torch.tensor(nodes, dtype=torch.float)
 
         # edges
@@ -178,7 +174,8 @@ def get_graphs(nodes_features_extraction=basic_node_extraction, edges_features_e
         df_nodes = df_nodes.sort_values(by='line')
         df_nodes = df_nodes.drop('transcription', axis=1)
         df_nodes = df_nodes.drop('line', axis=1)
-        nodes = df_nodes.to_numpy()
+        df_numerique = df_nodes.select_dtypes(include='number')
+        nodes = df_numerique.to_numpy()
         x = torch.tensor(nodes, dtype=torch.float)
 
         # edges
@@ -236,24 +233,15 @@ def train(model, train_graphs, optimizer, criterion,):
         loss_tot += loss
     return loss_tot
 
-def test_during_training(model, validation_graphs):
-    model.eval()
-    S = 0
-    for data in validation_graphs.values():
-        predicted = prediction(model, data)
-        f1 = f1_score(predicted, data.y.numpy())
-        S += f1
-    f1_moyen = S / len(validation_graphs)
-    print(f'F1-score: {f1_moyen}')
 
-def f1_over_validation_set(model, validation_graphs):
+def f1_score_moyen(model, graphs):
     model.eval()
     S = 0
-    for data in validation_graphs.values():
+    for data in graphs.values():
         predicted = prediction(model, data)
         f1 = f1_score(predicted, data.y.numpy())
         S += f1
-    f1_moyen = S / len(validation_graphs)
+    f1_moyen = S / len(graphs)
     return f1_moyen
 
 def prediction(model, graph):

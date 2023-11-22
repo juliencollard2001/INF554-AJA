@@ -133,8 +133,8 @@ def get_graphs(nodes_features_extraction=identity, edges_features_extraction=ide
     # getting original data
     df_train_nodes_brut, df_train_edges_brut, df_test_nodes_brut, df_test_edges_brut = get_data()
     # extracting features the same way for train and test
-    df_train_nodes = nodes_features_extraction(df_train_nodes_brut)
-    df_test_nodes = nodes_features_extraction(df_test_nodes_brut)
+    df_train_nodes = nodes_features_extraction(df_train_nodes_brut, df_train_edges_brut)
+    df_test_nodes = nodes_features_extraction(df_test_nodes_brut, df_test_edges_brut)
     df_train_edges = edges_features_extraction(df_train_edges_brut)
     df_test_edges = edges_features_extraction(df_test_edges_brut)
 

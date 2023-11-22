@@ -238,24 +238,17 @@ def f1_score_moyen(model, graphs):
     model.eval()
     S = 0
     for data in graphs.values():
-        predicted = prediction(model, data)
+        predicted = model.predict(data)
         f1 = f1_score(predicted, data.y.numpy())
         S += f1
     f1_moyen = S / len(graphs)
     return f1_moyen
 
-def prediction(model, graph):
-    model.eval()
-    with torch.no_grad():
-        logits = model(graph)
-        predictions = torch.sigmoid(logits)
-    return (predictions > model.threshold).int()
-
 
 def make_test_csv_submission(model, test_graphs, submission_name):
     test_labels = {}
     for id, graph in test_graphs.items():
-        y_test = prediction(model, graph)
+        y_test = model.predict(graph)
         test_labels[id] = y_test.tolist()
     file = open("submission-"+submission_name+".csv", "w")
     file.write("id,target_feature\n")
@@ -272,7 +265,7 @@ def analyse_model(model, validation_graphs):
     S = 0
     global_conf_matrix = np.zeros((2,2))
     for data in validation_graphs.values():
-        y_pred = prediction(model, data)
+        y_pred = model.predict(data)
         y_true = data.y.numpy()
         conf_matrix = confusion_matrix(y_true, y_pred)
         global_conf_matrix += conf_matrix

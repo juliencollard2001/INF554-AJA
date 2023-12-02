@@ -203,7 +203,61 @@ def get_graphs(nodes_features_extraction=identity, edges_features_extraction=ide
     return train_graphs, validation_graphs, test_graphs
 
 
+def make_graphs(df_train_nodes, df_train_edges, df_test_nodes, df_test_edges):
+    
+    edges_test_and_train = pd.concat([df_train_edges, df_test_edges])
+    links_types = edges_test_and_train['type_int'].unique()
 
+    train_graphs = {}
+    test_graphs = {}
+
+    for id in training_set:
+        # nodes
+        df_nodes = df_train_nodes[df_train_nodes['transcription'] == id]
+        df_nodes = df_nodes.sort_values(by='line')
+        df_nodes = df_nodes.drop('transcription', axis=1)
+        df_nodes = df_nodes.drop('line', axis=1)
+        labels_np = df_nodes['label'].values
+        df_nodes = df_nodes.drop('label', axis=1)
+        df_numerique = df_nodes.select_dtypes(include='number')
+        nodes = df_numerique.to_numpy()
+        x = torch.tensor(nodes, dtype=torch.float)
+
+        # edges
+        df_edges = df_train_edges[df_train_edges['transcription'] == id]
+        chanels = {t : [] for t in links_types}
+        for index, row in df_edges.iterrows():
+            chanels[row['type_int']].append([row['start'], row['end']])
+        chanels_list = chanels.values()
+        edges = [torch.tensor(chanel).t().contiguous() for chanel in chanels_list]
+
+        labels = torch.tensor(labels_np)
+        graph = Data(x=x, edge_index=edges, y=labels)
+        train_graphs[id] = graph
+
+    for id in test_set:
+        # nodes
+        df_nodes = df_test_nodes[df_test_nodes['transcription'] == id]
+        df_nodes = df_nodes.sort_values(by='line')
+        df_nodes = df_nodes.drop('transcription', axis=1)
+        df_nodes = df_nodes.drop('line', axis=1)
+        df_numerique = df_nodes.select_dtypes(include='number')
+        nodes = df_numerique.to_numpy()
+        x = torch.tensor(nodes, dtype=torch.float)
+
+        # edges
+        df_edges = df_test_edges[df_test_edges['transcription'] == id]
+        chanels = {t : [] for t in links_types}
+        for index, row in df_edges.iterrows():
+            chanels[row['type_int']].append([row['start'], row['end']])
+        chanels_list = chanels.values()
+        edges = [torch.tensor(chanel).t().contiguous() for chanel in chanels_list]
+
+        labels = torch.tensor(labels_np)
+        graph = Data(x=x, edge_index=edges)
+        test_graphs[id] = graph
+
+    return train_graphs, test_graphs
 
 def f1_score(y_pred, y_real):
     conf_matrix = confusion_matrix(y_real, y_pred)

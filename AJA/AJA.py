@@ -259,6 +259,18 @@ def make_graphs(df_train_nodes, df_train_edges, df_test_nodes, df_test_edges):
 
     return train_graphs, test_graphs
 
+def train_valdiation_split(train_graphs, validation_ratio=0.3):
+    def split(dic):
+        liste_cles = list(dic.keys())
+        random.shuffle(liste_cles)
+        taille_dictionnaire_1 = int(len(liste_cles) * validation_ratio)
+        sous_dictionnaire_1 = {cle: dic[cle] for cle in liste_cles[:taille_dictionnaire_1]}
+        sous_dictionnaire_2 = {cle: dic[cle] for cle in liste_cles[taille_dictionnaire_1:]}
+        return sous_dictionnaire_2, sous_dictionnaire_1
+    
+    train_graphs, validation_graphs = split(train_graphs)
+    return train_graphs, validation_graphs
+
 def f1_score(y_pred, y_real):
     conf_matrix = confusion_matrix(y_real, y_pred)
     tp, fp, fn, tn = conf_matrix[1, 1], conf_matrix[0, 1], conf_matrix[1, 0], conf_matrix[0, 0]

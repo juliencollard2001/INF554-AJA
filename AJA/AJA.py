@@ -259,7 +259,7 @@ def make_graphs(df_train_nodes, df_train_edges, df_test_nodes, df_test_edges):
 
     return train_graphs, test_graphs
 
-def train_valdiation_split(train_graphs, validation_ratio=0.3):
+def train_validation_split(train_graphs, validation_ratio=0.3):
     def split(dic):
         liste_cles = list(dic.keys())
         random.shuffle(liste_cles)

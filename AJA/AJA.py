@@ -326,6 +326,20 @@ def make_test_csv_submission(model, test_graphs, submission_name):
             file.write("\n")
     file.close()
 
+def make_test_csv_submission_from_dict(predictions, submission_name):
+    test_labels = {}
+    for id, pred in predictions.items():
+        test_labels[id] = pred.tolist()
+    file = open("submission-"+submission_name+".csv", "w")
+    file.write("id,target_feature\n")
+    for key, value in test_labels.items():
+        u_id = [key + "_" + str(i) for i in range(len(value))]
+        target = map(str, value) 
+        for row in zip(u_id, target):
+            file.write(",".join(row))
+            file.write("\n")
+    file.close()
+
 def analyse_model(model, validation_graphs):
     model.eval()
     S = 0

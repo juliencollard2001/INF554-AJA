@@ -1,0 +1,20 @@
+Project structure :
+The data folder contains original data as download from kaggle.
+The feature-extraction/bert directory contains bert embedding of each sentence.
+The training-states directory is used to save the best weights during training.
+The "data_manipulation.py" file contains all function needed to extract and refactor data.
+The "model_definition.py" file contains all model definitions.
+The "train_and_submit.ipynb" jupyter notebook contains the logic needed to get data, extract features, train models and make predicitons.
+
+Instructions
+- Open the train_and_submit.ipynb script in your preferred Python environment.
+- Running the first cell will install all needed dependencies. 
+- Run all cells. This will train the model and submit the results.
+- The submission file will be called "submissions.csv"
+Please note that the script may take some time to run.
+
+Support
+If you encounter any problems or have any questions about this script, you can contact one of us : 
+- alice.gorge@polytechnique.edu
+- arnaud.teinturier@polytechnique.edu
+- julien.collard@polytechnique.edu

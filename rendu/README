@@ -1,5 +1,5 @@
 Project structure :
-The data folder contains original data as download from kaggle.
+The data folder contains original data as downloaded from kaggle.
 The feature-extraction/bert directory contains bert embedding of each sentence.
 The training-states directory is used to save the best weights during training.
 The "data_manipulation.py" file contains all function needed to extract and refactor data.
